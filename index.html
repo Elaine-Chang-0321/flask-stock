@@ -10,106 +10,124 @@
 
     <style>
         body {
-            font-family: "Microsoft JhengHei", sans-serif;
-            background-color: #111;
-            color: #f0f0f0;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #fff;
+            font-family: "Segoe UI", sans-serif;
+            background-color: #f7f9fb;
+            color: #333;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        nav h1 {
-            font-family: 'Architects Daughter', cursive;
-            font-size: 24px;
-            color: #000;
+            justify-content: flex-start;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
 
-        main {
-            margin-top: 100px;
+        h1, h2, h3 {
+            margin: 0.5em 0;
         }
 
-        h1 {
-            color: #00bcd4;
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #004d99;
         }
 
-        .price {
-            font-size: 2em;
-            margin: 1em 0;
+        .total-value {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #111;
         }
 
-        .symbol {
-            color: #ffeb3b;
+        .currency {
+            font-size: 1.5rem;
+            color: #666;
         }
+
+        .summary {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .summary div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .positive { color: #4caf50; }
+        .negative { color: #f44336; }
+
+        .stocks-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stock-card {
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-width: 260px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .stock-card h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .stock-card p {
+            margin: 0.3rem 0;
+        }
+
+        .goog { background-color: #B3E5FC; }
+        .tsla { background-color: #FFCC80; }
     </style>
 
     <style>
-        #portfolio-summary {
-            position: fixed;
-            left: 0;
-            top: 100px;
-            width: 250px;
-            background-color: #1e1e1e;
-            color: #ddd;
-            padding: 20px;
-            border-right: 1px solid #333;
-            text-align: left;
-        }
-
-        #portfolio-summary h2 {
-            color: #00bcd4;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        #portfolio-summary .stat {
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        #portfolio-summary .positive {
-            color: #4caf50;
-        }
-
-        #portfolio-summary .negative {
-            color: #f44336;
-        }
-
-        main {
-            margin-left: 280px;
-        }
+        /* 移除左側黑色長方形樣式 */
     </style>
+
 </head>
 <body>
-    <nav>
-        <h1>Today's Price</h1>
-    </nav>
+    <div class="content">
+        <h1 class="header-title">庫存股總市值</h1>
+        <div class="currency">USD</div>
+        <div id="total-value" class="total-value">載入中...</div>
 
-    <main>
-        <h1>Today's Price</h1>
-        <div class="stock">
-            <div class="symbol">GOOG</div>
-            <div id="goog" class="price">載入中...</div>
+        <div class="summary">
+            <div>
+                <div>報酬率</div>
+                <div id="roi" class="stat-value">--%</div>
+            </div>
+            <div>
+                <div>損益</div>
+                <div id="profit" class="stat-value">--</div>
+            </div>
+            <div>
+                <div>成本</div>
+                <div id="cost" class="stat-value">--</div>
+            </div>
         </div>
-        <div class="stock">
-            <div class="symbol">TSLA</div>
-            <div id="tsla" class="price">載入中...</div>
+
+        <div class="stocks-container">
+            <div class="stock-card goog">
+                <h2>GOOG</h2>
+                <p id="goog">載入中...</p>
+            </div>
+            <div class="stock-card tsla">
+                <h2>TSLA</h2>
+                <p id="tsla">載入中...</p>
+            </div>
         </div>
-    </main>
+    </div>
 
     <script>
         async function fetchPrice(symbol, elementId) {
@@ -152,16 +170,13 @@
             const totalCost = (313.52 * 2) + (449.56 * 1);
             const profit = totalMarketValue - totalCost;
             const roi = (profit / totalCost) * 100;
-            const roiRounded = roi.toFixed(2);
-            const roiFormatted = roi > 0 ? `<span class="positive">+${roiRounded}%</span>` : `<span class="negative">${roiRounded}%</span>`;
 
-            document.getElementById('portfolio-summary').innerHTML = `
-                <h2>投資現況統計</h2>
-                <div class="stat"><b>目前庫存股總市值：</b>USD ${totalMarketValue.toFixed(2)}</div>
-                <div class="stat"><b>總付出成本：</b>USD ${totalCost.toFixed(2)}</div>
-                <div class="stat"><b>損益試算：</b>USD ${profit.toFixed(2)}</div>
-                <div class="stat"><b>報酬率：</b>${roiFormatted}</div>
-            `;
+            document.getElementById("total-value").textContent = totalMarketValue.toFixed(2);
+            document.getElementById("cost").textContent = totalCost.toFixed(2);
+            document.getElementById("profit").textContent = profit.toFixed(2);
+            const roiElement = document.getElementById("roi");
+            roiElement.textContent = roi.toFixed(2) + "%";
+            roiElement.className = roi >= 0 ? "positive" : "negative";
         }
 
         async function updatePrices() {
@@ -200,6 +215,5 @@
         updatePrices();
     </script>
 
-    <div id="portfolio-summary"></div>
 </body>
 </html>

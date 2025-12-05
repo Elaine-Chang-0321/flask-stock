@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>即時股價看板</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #111;
+            color: #f0f0f0;
+            text-align: center;
+            margin-top: 100px;
+        }
+        h1 {
+            color: #00bcd4;
+        }
+        .price {
+            font-size: 2em;
+            margin: 1em 0;
+        }
+        .symbol {
+            color: #ffeb3b;
+        }
+    </style>
+</head>
+<body>
+    <h1>即時股價看板</h1>
+    <div class="stock">
+        <div class="symbol">GOOG</div>
+        <div id="goog" class="price">載入中...</div>
+    </div>
+    <div class="stock">
+        <div class="symbol">TSLA</div>
+        <div id="tsla" class="price">載入中...</div>
+    </div>
+
+    <script>
+        async function fetchPrice(symbol, elementId) {
+            try {
+                const res = await fetch(`/price?symbol=${symbol}`);
+                const data = await res.json();
+                if (data.price) {
+                    document.getElementById(elementId).textContent = `USD ${data.price}`;
+                } else {
+                    document.getElementById(elementId).textContent = '無效代號';
+                }
+            } catch (error) {
+                document.getElementById(elementId).textContent = '錯誤';
+            }
+        }
+
+        function updatePrices() {
+            fetchPrice('GOOG', 'goog');
+            fetchPrice('TSLA', 'tsla');
+        }
+
+        updatePrices();
+        setInterval(updatePrices, 60000);
+    </script>
+</body>
+</html>
